@@ -7,9 +7,9 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context({ req }) {
-    const jwt = req.headers.authorization
+    // const jwt = req.headers.authorization
     
-    throw new Error('not auth')
+    // throw new Error('not auth')
 
     const user = models.User.findOne()
     return { models, db, user }
