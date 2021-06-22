@@ -13,7 +13,7 @@ module.exports = {
     }
   },
   Mutation: {
-      newPet(_, {input}, ctx) {
+      addPet(_, {input}, ctx) {
         const pet = ctx.models.Pet.create(input)
         return pet
       }

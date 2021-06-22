@@ -16,13 +16,43 @@ const ALL_PETS = gql`
   }
 `
 
+const NEW_PET = gql`
+  mutation CreateAPet($newPet: NewPetInput!) {
+    addPet(input: $newPet) {
+      id
+      name
+      type
+      img
+    }
+  }
+`
+
 export default function Pets () {
   const [modal, setModal] = useState(false)
 
-  const { data, loading, error } = useQuery(ALL_PETS)
+  const {data, loading, error} = useQuery(ALL_PETS)
+
+  const [createPet, newPet] = useMutation(NEW_PET, {
+    update(cache, { data: { addPet }}) {
+      const data = cache.readQuery({ query: ALL_PETS })
+
+      console.log('data', data)
+
+      cache.writeQuery({
+        query: ALL_PETS,
+        data: { pets: [addPet, ...data.pets] }
+      })
+    }
+  })
   
   const onSubmit = input => {
     setModal(false)
+
+    createPet({
+      variables: {
+        newPet: input
+      }
+    })
   }
 
   const PetsList = ({ pets }) => pets.map(pet => (
@@ -33,11 +63,11 @@ export default function Pets () {
     </div>
   ))
 
-  if (loading) {
+  if (loading || newPet.loading) {
     return <Loader />
   }
 
-  if (error) {
+  if (error || newPet.error) {
     return <p>Error!</p>
   }
   
